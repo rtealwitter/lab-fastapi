@@ -9,8 +9,8 @@ from openai import OpenAI
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--url")
-parser.add_argument("--apikey")
-parser.add_argument("--model", default='llama-3.1-8b-instant')
+parser.add_argument("--apikey", default="local-placeholder")
+parser.add_argument("--model", default='openai/gpt-oss-20b')
 parser.add_argument("--port", type=int, default=7860)
 args = parser.parse_args()
 
@@ -19,7 +19,12 @@ client = OpenAI(base_url=args.url, api_key=args.apikey)
 def chat(message, history):
     messages = []
     for msg in history:
-        messages.append({"role": msg["role"], "content": msg["content"]})
+        content = msg["content"]
+        # Gradio 6 represents text as content blocks; the API accepts plain text.
+        if isinstance(content, list):
+            content = "".join(block.get("text", "") for block in content
+                              if block.get("type") == "text")
+        messages.append({"role": msg["role"], "content": content})
     messages.append({"role": "user", "content": message})
     completion = client.chat.completions.create(
         model=args.model,

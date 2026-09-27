@@ -1,6 +1,6 @@
 fastapi>=0.100.0
 uvicorn>=0.23.0
-gradio
-dotenv
+gradio>=6,<7
+openai
+python-dotenv
 groq
-supply-chain-attack-poc
